@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	
+	<meta title="dragdrop" package="com.sample.dragdrop" version="0.0.1" company="whats up company" />
+	<app main="Main" path="Export" file="Dragdrop" />
+	
+	<source path="Source" />
+	
+	<haxelib name="lime" />
+	<haxelib name="whatformat" />
+	
+	<assets path="Assets" rename="assets" />
+	
+</project>
