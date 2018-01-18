@@ -16,10 +16,7 @@
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
-    <class path="C:\HaxeToolkit\haxe\lib\lime\5,9,1" />
     <class path="Source" />
-    <class path="..\..\whatformat\src" />
-    <class path="Export\neko\haxe" />
   </classpaths>
   <!-- Build options -->
   <build>
