@@ -1,43 +1,115 @@
 package;
 
+/**
+ * by Sylvio Sell - Rostock 2018
+ * 
+ * Drag and Drop Sample with haxe-lime and whatformat
+ * 
+*/
+
 import haxe.io.Bytes;
+
 import lime.ui.Window;
+import lime.app.Config;
+import lime.ui.KeyCode;
+import lime.ui.KeyModifier;
+
+import openfl.text.TextField;
+import openfl.display.Stage;
 
 import DragDropApp;
 import WhatFormat;
 
 class Main extends DragDropApp {
 	
+	var logText:TextField;
 	
 	public function new () {
-		
-		super ();
-		
+		// WhatFormat should load only:
+		// checkOnlyFormats = ['png', 'jpg'];
+		super();
 	}
 
-	//override public function onWindowCreate(window:Window):Void {}
-	//override public function onPreloadComplete():Void {}
-	
-	override function onWindowDropFileCross(filename:String, bytes:Bytes, wtf:WhatFormat, window:Window)
-	{
-		trace('Loaded: $filename, filesize: ${bytes.length}');
-		if (wtf.byName.found) {
-			trace('');
-			trace('detected by filename ending:');
-			trace('  format: ${wtf.byName.format} - ${wtf.byName.description}');
-			if (wtf.byName.subtype != null) trace('  subtype: ${wtf.byName.subtype} - ${wtf.byName.subtypeDescription}');
-		}
-		if (wtf.byHeader.found) {
-			trace('detected by parsing header-data:');
-			trace('  format: ${wtf.byHeader.format} - ${wtf.byHeader.description}');
-			if (wtf.byHeader.subtype != null) trace('  subtype: ${wtf.byHeader.subtype} - ${wtf.byHeader.subtypeDescription}');
-		}
-		trace('');
-		trace('WhatFormat found:');
-		trace('  format: ${wtf.format} - ${wtf.description}');
-		if (wtf.subtype != null) trace('  subtype: ${wtf.subtype} - ${wtf.subtypeDescription}');
-		trace("-------------------------------------\n");
+	/*
+	 * create log output
+	 * 
+	*/
+	override function create (config:Config):Void {	
+		super.create (config);
+		
+		var stage:Stage = new Stage (window, 0xF8F8F8);
+		
+		var helpText = new TextField();
+		helpText.width = window.width/2; helpText.height = 20;
+		helpText.scaleX = helpText.scaleY = 2;
+		helpText.selectable = false;
+		helpText.text = 'Drag Files into Window to detect what the fileformat is! (press "x" to clear output)';
+		stage.addChild (helpText);
+		
+		logText = new TextField();
+		logText.y = 37; logText.x = 2;
+		logText.border = true;
+		logText.width = window.width-4;
+		logText.height = window.height-40;
+		stage.addChild (logText);
+		
+		addModule (stage);
+		#if html5
+		// put link to supported fileformats
+		var link:js.html.AnchorElement = js.Browser.document.createAnchorElement();
+		link.href = "https://github.com/maitag/whatformat/blob/master/src/formats/Magic.hx#L7";
+		link.textContent = "--> supported formats"; link.target = "_blank";
+		link.style.position = "absolute"; link.style.top = "40px"; link.style.right = "30%";
+		link.style.zIndex = "2020";
+		link.style.backgroundColor = "#aaaaff";
+		js.Browser.document.body.appendChild(link);
+		#end
 	}
 	
+	/*
+	 * if File data comes in
+	 * 
+	*/
+	override function onWindowDropFileCross(filename:String, bytes:Bytes, wtf:WhatFormat, window:Window):Void {
+		log('\nLoaded: $filename, filesize: ${bytes.length} Bytes');
+		
+		if (wtf.byName.found) {
+			log('\ndetected by filename ending:');
+			log('   format: ${wtf.byName.format} - ${wtf.byName.description}');
+			if (wtf.byName.subtype != null) log('   subtype: ${wtf.byName.subtype} - ${wtf.byName.subtypeDescription}');
+		}
+		if (wtf.byHeader.found) {
+			log('\ndetected by parsing header-data:');
+			log('   format: ${wtf.byHeader.format} - ${wtf.byHeader.description}');
+			if (wtf.byHeader.subtype != null) log('   subtype: ${wtf.byHeader.subtype} - ${wtf.byHeader.subtypeDescription}');
+		}
+		log('');
+		log('WhatFormat:');
+		log('   format: ${wtf.format} - ${wtf.description}');
+		if (wtf.subtype != null) log('   subtype: ${wtf.subtype} - ${wtf.subtypeDescription}');
+		log("-----------------------------------------------------");
+	}
+	
+	/*
+	 * simple log into app-window
+	 * 
+	*/
+	override function log(s:Dynamic):Void {
+		logText.appendText("\n" + s);
+		logText.scrollV = logText.maxScrollV;
+		trace(s);
+	}
+	
+	/*
+	 * to clear the log-output
+	 * 
+	*/
+	override function onKeyUp (window:Window, key:KeyCode, modifier:KeyModifier):Void {
+		switch (key) {
+			case KeyCode.X: logText.scrollV = 1; logText.text = '';
+			default:			
+		};		
+	}	
+
 
 }

@@ -1,7 +1,14 @@
 package;
 
+/**
+ * by Sylvio Sell - Rostock 2018
+ * 
+ * html5 drag&drop events for Lime Application
+ * 
+ * reads the dragged Files in and checks what format is
+ */
+
 import haxe.io.Bytes;
-//import lime.utils.Bytes;
 import lime.app.Application;
 import lime.ui.Window;
 
@@ -22,6 +29,9 @@ import WhatFormat;
 
 class DragDropApp extends Application {
 
+	public var checkOnlyFormats:Array<String> = null;
+	public var preferHeader:Bool = true;
+	
 	#if html5
 
 	override public function onPreloadComplete():Void {
@@ -63,11 +73,15 @@ class DragDropApp extends Application {
 		//trace("loadBytes from "+file.name);
 		var fileReader:FileReader = new FileReader();
 		
-		var wtf:WhatFormat = new WhatFormat();
+		var wtf:WhatFormat = new WhatFormat(checkOnlyFormats, preferHeader);
 		wtf.checkFilenameEnding(file.name); // detect by filename at first
 		
 		fileReader.onload = function(e) { onHeaderLoaded(file, fileReader, wtf); }
-		fileReader.readAsArrayBuffer( file.slice(0, Std.int(Math.max(wtf.maxHeaderLength, file.size))) );
+		
+		if (wtf.found || file.type != "" || file.size % 4096 != 0) // hack for filefolders (window os only?)
+		{
+			fileReader.readAsArrayBuffer( file.slice(0, Std.int(Math.max(wtf.maxHeaderLength, file.size))) );
+		} else log('\nERROR reading File "${file.name}" (windows-os filefolder?)');
 	}
 	
 	function onHeaderLoaded( file:File, fileReader:FileReader, wtf:WhatFormat):Void
@@ -83,10 +97,10 @@ class DragDropApp extends Application {
 			}
 			fileReader.readAsArrayBuffer(file);
 		}
-		else trace('can\'t detect fileformat of ${file.name}');
-	}
+		else log('\nCan\'t detect fileformat of "${file.name}"');
+	}	
+	
 	#else
-
 	
 	/*
 	 * Lime window-event (not html5)
@@ -100,31 +114,34 @@ class DragDropApp extends Application {
 			onFileInput(bytes, window);
 		});
 		*/
-		var wtf:WhatFormat = new WhatFormat();//var wtf:WhatFormat = new WhatFormat(['png','jpg','hx']);
+		var wtf:WhatFormat = new WhatFormat(checkOnlyFormats, preferHeader);
 		wtf.checkFilenameEnding(filename); // detect by filename at first
 		
-		var file:FileInput = File.read(filename);
-		var cache:BytesOutput = new BytesOutput();
-		var byte:Int;
-		try // load file
-		{
-			do
+		try {
+			var file:FileInput = File.read(filename);
+			var cache:BytesOutput = new BytesOutput();
+			var byte:Int;
+			try // load file
 			{
-				byte = file.readByte();
-				cache.writeByte(byte);
-				//if (wtf.proceed) trace(StringTools.hex(byte,2));
+				do
+				{
+					byte = file.readByte();
+					cache.writeByte(byte);
+					//if (wtf.proceed) trace(StringTools.hex(byte,2));
+				}
+				while ( wtf.checkNextByte(byte) || wtf.found ); // do not stop after proceed or something found
 			}
-			while ( wtf.checkNextByte(byte) || wtf.found ); // do not stop after proceed or something found
+			catch ( ex:haxe.io.Eof ) {}
+			file.close();
+			
+			// found byHeader or byName
+			if (wtf.found) {
+				// TODO: Attributes
+				onWindowDropFileCross(filename, cache.getBytes(), wtf, window);
+			}
+			else log('\ncan\'t detect fileformat of "${filename}"');
 		}
-		catch( ex:haxe.io.Eof ) {}
-		file.close();
-		
-		// found byHeader or byName
-		if (wtf.found) {
-			// TODO: Attributes
-			onWindowDropFileCross(filename, cache.getBytes(), wtf, window);
-		}
-		else trace('can\'t detect fileformat of ${filename}');
+		catch (err:Dynamic) { log('\nERROR reading File "${filename}"'); log(err); }
 	}
 
 	#end
@@ -133,5 +150,16 @@ class DragDropApp extends Application {
 	 * new event for DragDropApp
 	 * 
 	*/
-	function onWindowDropFileCross(filename:String, bytes:Bytes, wtf:WhatFormat, window:Window) {};
+	function onWindowDropFileCross(filename:String, bytes:Bytes, wtf:WhatFormat, window:Window) {
+	};
+	
+
+	/*
+	 * simple log into app-window
+	 * 
+	*/
+	function log(s:Dynamic):Void {
+		trace(s);
+	}
+
 }

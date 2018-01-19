@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	
-	<meta title="dragdrop" package="dragdrop" version="0.0.1" company="Sylvio Sell - maitag" />
+	<meta title="dragdrop" package="dragdrop" version="0.0.2" company="Sylvio Sell - maitag" />
 	<app main="Main" path="Export" file="dragdrop" />
 	
 	<source path="Source" />
 	
+	<haxelib name="openfl" /><!-- openfl needs to load 'before' lime -->
 	<haxelib name="lime" />
+	
 	<haxelib name="whatformat" />
 	
+	<!-- <haxedef name="source-map-content" /> -->
+	<!-- <haxedef name="no-traces" /> -->
+	<haxeflag name="-dce" value="full" />
 	
 </project>
