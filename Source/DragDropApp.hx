@@ -106,7 +106,7 @@ class DragDropApp extends Application {
 	 * Lime window-event (not html5)
 	 *
 	*/
-	override public function onWindowDropFile(window:Window, filename:String):Void
+	override public function onWindowDropFile(filename:String):Void
 	{
 		trace('\n=========== DRAGGED IN: winwow.id:${window.id}, filename:$filename ========');
 		/*

@@ -10,7 +10,6 @@ package;
 import haxe.io.Bytes;
 
 import lime.ui.Window;
-import lime.app.Config;
 import lime.ui.KeyCode;
 import lime.ui.KeyModifier;
 
@@ -24,18 +23,13 @@ class Main extends DragDropApp {
 	
 	var logText:TextField;
 	
-	public function new () {
-		// WhatFormat should load only:
-		// checkOnlyFormats = ['png', 'jpg'];
-		super();
-	}
+	public function new () super();
 
 	/*
 	 * create log output
 	 * 
 	*/
-	override function create (config:Config):Void {	
-		super.create (config);
+	override function onWindowCreate ():Void {	
 		
 		var stage:Stage = new Stage (window, 0xF8F8F8);
 		
@@ -104,7 +98,7 @@ class Main extends DragDropApp {
 	 * to clear the log-output
 	 * 
 	*/
-	override function onKeyUp (window:Window, key:KeyCode, modifier:KeyModifier):Void {
+	override function onKeyUp (key:KeyCode, modifier:KeyModifier):Void {
 		switch (key) {
 			case KeyCode.X: logText.scrollV = 1; logText.text = '';
 			default:			
