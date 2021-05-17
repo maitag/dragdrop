@@ -29,22 +29,32 @@ class Main extends DragDropApp {
 	 * create log output
 	 * 
 	*/
-	override function onWindowCreate ():Void {	
+	override function onWindowCreate ():Void {
+		
+		// allowed fileformats to load:
+		// look here for what can be detected by "whatformat"-haxelib: 
+		// https://github.com/maitag/whatformat/blob/master/src/formats/Magic.hx#L7
+		
+		// checkOnlyFormats = ["png"];
+		
 		
 		var stage:Stage = new Stage (window, 0xF8F8F8);
 		
 		var helpText = new TextField();
-		helpText.width = window.width/2; helpText.height = 20;
+		helpText.width = window.width / 2;
+		helpText.height = 40;
 		helpText.scaleX = helpText.scaleY = 2;
 		helpText.selectable = false;
-		helpText.text = 'Drag Files into Window to detect what the fileformat is! (press "x" to clear output)';
+		helpText.text = "Drag Files into Window to load a file and detect fileformat!\n";
+		if (checkOnlyFormats != null) helpText.text += 'Allowed Fileformats: ' + checkOnlyFormats.join(", ") + "  ";
+		helpText.text += '(press "x" to clear output)';
 		stage.addChild (helpText);
 		
 		logText = new TextField();
-		logText.y = 37; logText.x = 2;
+		logText.y = 74; logText.x = 2;
 		logText.border = true;
 		logText.width = window.width-4;
-		logText.height = window.height-40;
+		logText.height = window.height - helpText.height - 10;
 		stage.addChild (logText);
 		
 		addModule (stage);

@@ -78,10 +78,11 @@ class DragDropApp extends Application {
 		
 		fileReader.onload = function(e) { onHeaderLoaded(file, fileReader, wtf); }
 		
-		if (wtf.found || file.type != "" || file.size % 4096 != 0) // hack for filefolders (window os only?)
+		if (wtf.found || file.type != "" || file.size % 4096 != 0) // hack if someone drops filefolders (window os only?)
 		{
 			fileReader.readAsArrayBuffer( file.slice(0, Std.int(Math.max(wtf.maxHeaderLength, file.size))) );
-		} else log('\nERROR reading File "${file.name}" (windows-os filefolder?)');
+		} 
+		else log('\nERROR reading File "${file.name}" (windows-os filefolder?)');
 	}
 	
 	function onHeaderLoaded( file:File, fileReader:FileReader, wtf:WhatFormat):Void
